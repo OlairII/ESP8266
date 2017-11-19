@@ -3,8 +3,7 @@ local module = {}
 module.station_cfg = {} 
 module.station_cfg.ssid = "jrwifi"
 module.station_cfg.pwd = "senha321"
-module.station_cfg.auto = true
-module.station_cfg.save = true
+station_cfg.save = true
 
 module.HOST = "broker.hivemq.com"  
 module.PORT = 1883  
@@ -17,7 +16,5 @@ module.config_addr = 0x01 --config register
 module.temp_addr = 0x00 --temp register
 module.resolution = 0x60 --resolucao 12bits
 
-module.ENDPOINT = "JRNodemcu/"
-
-
+module.ENDPOINT = "JRNodemcu/" 
 return module

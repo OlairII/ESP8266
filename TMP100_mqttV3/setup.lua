@@ -1,32 +1,31 @@
 -- file: setup.lua
 local module = {}
 
-local function wifi_wait_ip()  
-  if wifi.sta.getip()== nil then
-    print("IP unavailable, Waiting...")
-  else
-    tmr.stop(1)
-    print("\n====================================")
-    print("IP is "..wifi.sta.getip())
-    print("====================================")
-    app.start()
-  end
+
+
+function time_sync()
+    sntp.sync("a.st1.ntp.br")
+    sec = rtctime.get()
+    if sec ~= 0 then
+        tmr.stop(1)
+        tm = rtctime.epoch2cal(rtctime.get()-3600*2)
+        print("Connection established at:")
+        print(string.format("%04d/%02d/%02d %02d:%02d:%02d", tm["year"], tm["mon"], tm["day"], tm["hour"], tm["min"], tm["sec"]))
+        app.start()
+    else
+        print("No time aquired")
+        tmr.alarm(1,5000, 1, time_sync)
+    end
 end
 
-local function wifi_start(list_aps)  
-    if list_aps then
-        for key,value in pairs(list_aps) do
-            if config.SSID and config.SSID[key] then
-                wifi.setmode(wifi.STATION);
-                wifi.sta.config(config.station_cfg)
-                wifi.sta.connect()
-                print("Connecting to " .. key .. " ...")
-                --config.SSID = nil  -- can save memory
-                tmr.alarm(1, 2500, 1, wifi_wait_ip)
-            end
-        end
+local function wifi_wait_ip()
+    if wifi.sta.getip()== nil then
+        print("IP unavailable, Waiting...")
     else
-        print("Error getting AP list")
+        tmr.stop(1)
+        print("IP is "..wifi.sta.getip())
+        time_sync()
+        
     end
 end
 
@@ -43,10 +42,9 @@ end
 function module.start()
 	TMP100()
 	print("Configuring Wifi ...")
-	wifi.setmode(wifi.STATION);
-	wifi.sta.getap(wifi_start)
+    wifi.setmode(wifi.STATION);
+	wifi.sta.config(config.station_cfg)
+    tmr.alarm(1, 1000, 1, wifi_wait_ip)    
 end
 
-
-
-return module  
+return module

@@ -1,0 +1,40 @@
+-- Programa: Web Server com ESP8266 Nodemcu
+-- Autor: FILIPEFLOP
+ 
+-- Conexao na rede Wifi
+wifi.setmode(wifi.STATION)
+wifi.sta.config("jrwifi","senha321")
+ip = wifi.sta.getip()
+uart.write(0, ip)
+-- Definicoes do pino do led
+led1 = 1
+gpio.mode(led1, gpio.OUTPUT)
+-- Definicoes do Web Server
+srv=net.createServer(net.TCP)
+srv:listen(80,function(conn)
+    conn:on("receive", function(client,request)
+        local buf = "";
+        local _, _, method, path, vars = string.find(request, "([A-Z]+) (.+)?(.+) HTTP");
+        if(method == nil)then
+            _, _, method, path = string.find(request, "([A-Z]+) (.+) HTTP");
+        end
+        local _GET = {}
+        if (vars ~= nil)then
+            for k, v in string.gmatch(vars, "(%w+)=(%w+)&*") do
+                _GET[k] = v
+            end
+        end
+        buf = buf.."<h1><u>FILIPEFLOP</u></h1>";
+        buf = buf.."<h2><i>ESP8266 Web Server</i></h2>";
+        buf = buf.."<p><a href=\"?pin=LIGA1\"><button><b>LED 1 LIG</b></button></a> <br/><br/><a href=\"?pin=DESLIGA1\"><button><b>LED 1 DES</b></button></a></p>";
+                local _on,_off = "",""
+        if(_GET.pin == "LIGA1")then
+              gpio.write(led1, gpio.HIGH);
+        elseif(_GET.pin == "DESLIGA1")then
+              gpio.write(led1, gpio.LOW);
+        end
+        client:send(buf);
+        client:close();
+        collectgarbage();
+    end)
+end)

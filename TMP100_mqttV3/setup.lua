@@ -13,7 +13,7 @@ function time_sync()
         print(string.format("%04d/%02d/%02d %02d:%02d:%02d", tm["year"], tm["mon"], tm["day"], tm["hour"], tm["min"], tm["sec"]))
         app.start()
     else
-        print("No time aquired")
+        print("No time acquired")
         tmr.alarm(1,5000, 1, time_sync)
     end
 end

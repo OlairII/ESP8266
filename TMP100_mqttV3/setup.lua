@@ -29,6 +29,11 @@ local function wifi_wait_ip()
     end
 end
 
+--Reed switch config
+local function RS_config()
+    gpio.mode(config.rSwitchPin, gpio.INT, gpio.PULLUP)
+end
+
 --------TMP 100 config
 local function TMP100()
     i2c.setup(0, config.sda, config.scl, i2c.SLOW)
@@ -40,10 +45,11 @@ local function TMP100()
 end
 
 function module.start()
-	TMP100()
-	print("Configuring Wifi ...")
+    RS_config()
+    TMP100()
+    print("Configuring Wifi ...")
     wifi.setmode(wifi.STATION);
-	wifi.sta.config(config.station_cfg)
+    wifi.sta.config(config.station_cfg)
     tmr.alarm(1, 1000, 1, wifi_wait_ip)    
 end
 
